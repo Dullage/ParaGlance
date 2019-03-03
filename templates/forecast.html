@@ -1,0 +1,132 @@
+{% for day in forecast.data.SiteRep.DV.Location.Period %}
+  {% set date = forecast.convert_date(day["value"]) %}
+  {% if forecast.is_not_past_date(date) %}
+    <div class="day">
+      <div class="day-header">{{ forecast.date_to_day(date) }}</div>
+      <div class="day-sub-header">{{ forecast.prettify_date(date) }}</div>
+      <table>
+        <thead>
+            <!-- Time -->
+            <td></td>
+
+            <!-- Wind Speed -->
+            <td>
+              <span class="mdi mdi-speedometer color-inherit attribute-icon" title="Wind Speed"></span>
+              <span class="attribute-title"><br>Wind Speed</span>
+            </td>
+
+            <!-- Gust Strength -->
+            <td>
+              <span class="mdi mdi-weather-windy color-inherit attribute-icon" title="Gust Strength"></span>
+              <span class="attribute-title"><br>Gust Strength</span>
+            </td>
+
+            <!-- Gust Difference -->
+            <td>
+              <span class="mdi mdi-calculator color-inherit attribute-icon" title="Gust Difference"></span>
+              <span class="attribute-title"><br>Gust Difference</span>
+            </td>
+
+            <!-- Conditions -->
+            <td>
+              <span class="mdi mdi-weather-cloudy color-inherit attribute-icon" title="Conditions"></span>
+              <span class="attribute-title"><br>Conditions</span>
+            </td>
+
+            <!-- Wind Direction -->
+            <td>
+              <span class="mdi mdi-compass-outline color-inherit attribute-icon" title="Wind Direction"></span>
+              <span class="attribute-title"><br>Direction</span>
+            </td>
+
+            <!-- Sites -->
+            <td>
+              <span class="mdi mdi-map-marker-outline color-inherit attribute-icon" title="Conditions"></span>
+              <span class="attribute-title"><br>Sites</span>
+            </td>
+
+        </thead>
+        <tbody>
+          {% for time in day.Rep %}
+            {% if forecast.is_daylight(time["$"]) and forecast.is_not_past_time(date, time["$"]|int) %}
+
+              <!-- Calculate the Gust Difference -->
+              {% set gust_difference = time.G|int - time.S|int %}
+
+              <!-- Attribute Classification -->
+              {% set wind_speed_class = forecast.classify('wind_speed', time.S|int) %}
+              {% set gust_strength_class = forecast.classify('gust_strength', time.G|int) %}
+              {% set gust_difference_class = forecast.classify('gust_difference', gust_difference) %}
+              {% set conditions_class = forecast.classify('conditions', time.W|int) %}
+              {% set wind_direction_class = forecast.classify('wind_direction', time.D) %}
+
+              <!-- Row Classification -->
+              {% if wind_speed_class == "positive"
+                 and gust_strength_class == "positive"
+                 and gust_difference_class == "positive"
+                 and conditions_class == "positive"
+                 and wind_direction_class == "positive" %}
+                {% set time_class = "flyable" %}
+              {% else %}
+                {% set time_class = "unflyable" %}
+              {% endif %}
+
+              <tr>
+                <!-- Time -->
+                <td class="right-align bold">
+                  {{ forecast.format_time(time["$"]) }}
+                </td>
+
+                <!-- Wind Speed -->
+                <td class="{{ wind_speed_class }} {{ time_class }} row-left">
+                  {{ time.S }}<span class="mph"> mph</span>
+                </td>
+
+                <!-- Gust Strength -->
+                <td class="{{ gust_strength_class }} {{ time_class }}">
+                  {{ time.G }}<span class="mph"> mph</span>
+                </td>
+
+                <!-- Gust Difference -->
+                <td class="{{ gust_difference_class }} {{ time_class }}">
+                  {{ gust_difference }}<span class="mph"> mph</span>
+                </td>
+
+                <!-- Conditions -->
+                <td class="{{ conditions_class }} {{ time_class }}">
+                  {{ forecast.condition(time["W"]) }}
+                </td>
+
+                <!-- Wind Direction -->
+                <td class="{{ wind_direction_class }} {{ time_class }} row-right">
+                  {{ time.D }}
+                </td>
+
+                <!-- Sites -->
+                <td>
+                  {% set sites = forecast.get_site_list(time["D"]) %}
+                  {% if sites %}
+                    {% for site in sites %}
+                      {{ site.name }}<br>
+                    {% endfor %}
+                  {% else %}
+                    <span class="no-sites">No Sites</span>
+                  {% endif %}
+                </td>
+
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+{% endfor %}
+
+<!-- Footer -->
+<div id="footer">
+  <span>Weather data last refreshed at {{ forecast.last_refresh }} 
+    - View on <a href="https://github.com/Dullage/ParaGlance">
+      <span class="mdi mdi-github-circle"></span> GitHub
+    </a></span>
+</div>

@@ -1,0 +1,208 @@
+* {
+    font-family: 'Open Sans', sans-serif;
+    color: rgb(16, 16, 77);
+    margin: 0;
+    padding: 0; 
+    box-sizing: border-box;
+}
+
+body {
+    background: url("/static/vladimir-anikeev-358805-unsplash.jpg") no-repeat center center fixed;
+    background-size: cover;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+
+/* Loading */
+
+#loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: fixed;
+    height: 100%;
+    width: 100%;
+}
+
+#loading-icon {
+    font-size: 64px;
+}
+
+#loading-text {
+    font-size: 16px;
+}
+
+
+/* Content */
+
+#content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+#header {
+    margin: 30px 0 60px 0;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 18px 0 26px 0;
+    border-radius: 24px;
+}
+
+#title-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#title-icon {
+    font-size: 74px;
+    margin: 0 12px 0 0;
+    color: #1400c7;
+}
+
+#header h1 {
+    font-size: 56px;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+}
+
+#header p {
+    font-size: 17px;
+}
+
+#footer {
+    margin: 0 0 30px 0;
+    text-align: center;
+}
+#footer span {
+    color: whitesmoke;
+    font-size: 11px;
+}
+
+
+/* Forecast */
+
+.day {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 26px;
+    margin: 0 0 60px 0;
+    border-radius: 24px;
+}
+
+.day-header {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.day-sub-header {
+    font-size: 16px;
+}
+
+table {
+    width: 100%;
+    border-spacing: 0 4px;
+}
+
+thead {
+    font-weight: bold;
+    text-align: center;
+}
+
+.attribute-icon {
+    font-size: 30px;
+}
+
+.row-left {
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.row-right {
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+td {
+    padding: 12px;
+}
+
+.positive {
+    color: green;
+}
+
+.flyable {
+    background-color: rgba(175, 230, 144, 0.37)
+}
+
+.negative {
+    color: crimson;
+}
+
+.no-sites {
+    color: lightgray;
+}
+
+.right-align {
+    text-align: right;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.mph {
+    font-size: 14px;
+    color: inherit;
+}
+
+
+/* Small Screens */
+
+@media only screen and (max-width: 1000px) {
+    .attribute-title {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 800px) {
+    .mph {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 650px) {
+    * {
+        font-size: 12px;
+    }
+
+    #content {
+        padding: 0;
+    }
+
+    .day {
+        border-radius: 0;
+        padding: 4px;
+    }
+
+    .day-header {
+        font-size: 16px;
+    }
+    
+    .day-sub-header {
+        font-size: 12px;
+    }
+
+    .attribute-icon {
+        font-size: 16px;
+    }
+
+    td {
+        padding: 4px;
+    }
+}
