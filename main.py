@@ -44,30 +44,11 @@ class Forecast():
         self.last_refresh = datetime.datetime.now()
 
     @classmethod
-    def convert_date(cls, date_string):
-        return datetime.datetime.strptime(
-            date_string,
-            "%Y-%m-%dZ"
-        ).date()
-
-    @classmethod
-    def prettify_date(cls, date):
-        ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(math.floor(n/10)%10!=1)*(n%10<4)*n%10::4])  # noqa
-        day_num = int(date.strftime("%d"))
-        return str(ordinal(day_num)) + " " + date.strftime("%B")
-
-    @classmethod
     def is_not_past_date(cls, date):
         if date < datetime.date.today():
             return False
         else:
             return True
-
-    @classmethod
-    def current_minute(cls):
-        now = datetime.datetime.now()
-        midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        return (now - midnight).total_seconds() / 60
 
     @classmethod
     def is_not_past_time(cls, date, time_code):
@@ -78,7 +59,58 @@ class Forecast():
         if (time_code + 179) > current_minute:
             return True
 
-        return False
+        else:
+            return False
+
+    @classmethod
+    def convert_date(cls, date_string):
+        return datetime.datetime.strptime(
+            date_string,
+            "%Y-%m-%dZ"
+        ).date()
+
+    @classmethod
+    def is_daylight(cls, time_code):
+        if time_code in ['360', '540', '720', '900', '1080']:
+            return True
+        else:
+            return False
+
+    def remove_bad_date(self):
+        temp_date_list = []
+        for day in self.data["SiteRep"]["DV"]["Location"]["Period"]:
+            date = Forecast.convert_date(day["value"])
+            today = datetime.date.today()
+
+            # Ignore Past Days
+            if date < today:
+                pass
+
+            # Ignore Past Times (for current date) & Night Times
+            else:
+                temp_time_list = []
+                for time in day["Rep"]:
+                    if Forecast.is_not_past_time(date, int(time["$"])) \
+                       and Forecast.is_daylight(time["$"]):
+                        temp_time_list.append(time)
+                day["Rep"] = temp_time_list
+
+                # Only add the date back if there are times left
+                if len(temp_time_list) > 0:
+                    temp_date_list.append(day)
+        self.data["SiteRep"]["DV"]["Location"]["Period"] = temp_date_list
+
+    @classmethod
+    def prettify_date(cls, date):
+        ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(math.floor(n/10)%10!=1)*(n%10<4)*n%10::4])  # noqa
+        day_num = int(date.strftime("%d"))
+        return str(ordinal(day_num)) + " " + date.strftime("%B")
+
+    @classmethod
+    def current_minute(cls):
+        now = datetime.datetime.now()
+        midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        return (now - midnight).total_seconds() / 60
 
     @classmethod
     def date_to_day(cls, date):
@@ -99,13 +131,6 @@ class Forecast():
         }
 
         return times[time_code]
-
-    @classmethod
-    def is_daylight(cls, time_code):
-        if time_code in ['360', '540', '720', '900', '1080']:
-            return True
-        else:
-            return False
 
     @classmethod
     def condition(cls, code):
@@ -241,7 +266,8 @@ def index():
 def get_forecast():
     if forecast.last_refresh < \
        datetime.datetime.now() - FORECAST_CACHE_TIMEOUT:
-        forecast.get(debug=False)
+        forecast.get(debug=True)
+        forecast.remove_bad_date()
 
     return render_template(
         "forecast.html",
