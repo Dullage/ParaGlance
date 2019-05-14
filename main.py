@@ -1,25 +1,23 @@
 #!/usr/bin/env python3
 
-from flask import Flask, render_template
-import requests
-import json
-import datetime
 import calendar
+import datetime
+import json
 import math
 from os import environ
+
+import requests
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
 API_KEY = environ.get("MET_OFFICE_API_KEY")
 
 LOCATION_ID = 351611
-FORECAST_CACHE_TIMEOUT = datetime.timedelta(
-    minutes=30
-)
+FORECAST_CACHE_TIMEOUT = datetime.timedelta(minutes=30)
 
 
-class Forecast():
-
+class Forecast:
     def __init__(self, api_key, location_id):
         self.api_key = api_key
         self.location_id = location_id
@@ -29,9 +27,12 @@ class Forecast():
         self.data = {}
 
     def get(self, debug=False):
-        base_url = "http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json"  # noqa
+        base_url = (
+            "http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json"
+        )
         url = "{0}/{1}?res=3hourly&key={2}".format(
-            base_url, self.location_id, self.api_key)
+            base_url, self.location_id, self.api_key
+        )
 
         response = requests.get(url)
         response.raise_for_status()
@@ -64,14 +65,11 @@ class Forecast():
 
     @classmethod
     def convert_date(cls, date_string):
-        return datetime.datetime.strptime(
-            date_string,
-            "%Y-%m-%dZ"
-        ).date()
+        return datetime.datetime.strptime(date_string, "%Y-%m-%dZ").date()
 
     @classmethod
     def is_daylight(cls, time_code):
-        if time_code in ['360', '540', '720', '900', '1080']:
+        if time_code in ["360", "540", "720", "900", "1080"]:
             return True
         else:
             return False
@@ -90,8 +88,9 @@ class Forecast():
             else:
                 temp_time_list = []
                 for time in day["Rep"]:
-                    if Forecast.is_not_past_time(date, int(time["$"])) \
-                       and Forecast.is_daylight(time["$"]):
+                    if Forecast.is_not_past_time(
+                        date, int(time["$"])
+                    ) and Forecast.is_daylight(time["$"]):
                         temp_time_list.append(time)
                 day["Rep"] = temp_time_list
 
@@ -102,7 +101,12 @@ class Forecast():
 
     @classmethod
     def prettify_date(cls, date):
-        ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(math.floor(n/10)%10!=1)*(n%10<4)*n%10::4])  # noqa
+        ordinal = lambda n: "%d%s" % (  # noqa
+            n,
+            "tsnrhtdd"[
+                (math.floor(n / 10) % 10 != 1) * (n % 10 < 4) * n % 10:: 4
+            ],
+        )
         day_num = int(date.strftime("%d"))
         return str(ordinal(day_num)) + " " + date.strftime("%B")
 
@@ -127,7 +131,7 @@ class Forecast():
             "540": "9-12pm",
             "720": "12-3pm",
             "900": "3-6pm",
-            "1080": "6-9pm"
+            "1080": "6-9pm",
         }
 
         return times[time_code]
@@ -166,7 +170,7 @@ class Forecast():
             "27": "Heavy snow",
             "28": "Thunder shower",
             "29": "Thunder shower",
-            "30": "Thunder"
+            "30": "Thunder",
         }
 
         return conditions[code]
@@ -174,34 +178,21 @@ class Forecast():
     @classmethod
     def get_site_list(cls, wind_direction):
         sites = [
+            {"name": "Beachy Head", "wind_directions": ["SE"]},
+            {"name": "Bo Peep", "wind_directions": ["NNE", "NE", "ENE"]},
+            {"name": "Caburn", "wind_directions": ["S", "SSW", "SW"]},
             {
-                "name": "Beachy Head",
-                "wind_directions": ["SE"]
-            }, {
-                "name": "Bo Peep",
-                "wind_directions": ["NNE", "NE", "ENE"]
-            }, {
-                "name": "Caburn",
-                "wind_directions": ["S", "SSW", "SW"]
-            }, {
                 "name": "Devils Dyke",
-                "wind_directions": ["N", "WNW", "NW", "NNW"]
-            }, {
-                "name": "Ditchling",
-                "wind_directions": ["N", "NNE", "NNW"]
-            }, {
-                "name": "Firle",
-                "wind_directions": ["N", "NNE", "NW", "NNW"]
-            }, {
-                "name": "High & Over",
-                "wind_directions": ["E"]
-            }, {
+                "wind_directions": ["N", "WNW", "NW", "NNW"],
+            },
+            {"name": "Ditchling", "wind_directions": ["N", "NNE", "NNW"]},
+            {"name": "Firle", "wind_directions": ["N", "NNE", "NW", "NNW"]},
+            {"name": "High & Over", "wind_directions": ["E"]},
+            {
                 "name": "Newhaven Cliffs",
-                "wind_directions": ["SSE", "S", "SSW"]
-            }, {
-                "name": "Truleigh",
-                "wind_directions": ["N", "NNE", "NNW"]
-            }
+                "wind_directions": ["SSE", "S", "SSW"],
+            },
+            {"name": "Truleigh", "wind_directions": ["N", "NNE", "NNW"]},
         ]
 
         return_sites = []
@@ -257,19 +248,16 @@ forecast = Forecast(API_KEY, LOCATION_ID)
 
 @app.route("/")
 def index():
-    return render_template(
-        "index.html"
-    )
+    return render_template("index.html")
 
 
 @app.route("/get-forecast")
 def get_forecast():
-    if forecast.last_refresh < \
-       datetime.datetime.now() - FORECAST_CACHE_TIMEOUT:
+    if (
+        forecast.last_refresh
+        < datetime.datetime.now() - FORECAST_CACHE_TIMEOUT
+    ):
         forecast.get(debug=True)
         forecast.remove_bad_date()
 
-    return render_template(
-        "forecast.html",
-        forecast=forecast
-    )
+    return render_template("forecast.html", forecast=forecast)
