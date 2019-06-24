@@ -74,7 +74,7 @@ class Forecast:
         else:
             return False
 
-    def remove_bad_date(self):
+    def remove_bad_dates(self):
         temp_date_list = []
         for day in self.data["SiteRep"]["DV"]["Location"]["Period"]:
             date = Forecast.convert_date(day["value"])
@@ -97,6 +97,7 @@ class Forecast:
                 # Only add the date back if there are times left
                 if len(temp_time_list) > 0:
                     temp_date_list.append(day)
+
         self.data["SiteRep"]["DV"]["Location"]["Period"] = temp_date_list
 
     @classmethod
@@ -104,7 +105,7 @@ class Forecast:
         ordinal = lambda n: "%d%s" % (  # noqa
             n,
             "tsnrhtdd"[
-                (math.floor(n / 10) % 10 != 1) * (n % 10 < 4) * n % 10:: 4
+                (math.floor(n / 10) % 10 != 1) * (n % 10 < 4) * n % 10 :: 4
             ],
         )
         day_num = int(date.strftime("%d"))
@@ -178,21 +179,51 @@ class Forecast:
     @classmethod
     def get_site_list(cls, wind_direction):
         sites = [
-            {"name": "Beachy Head", "wind_directions": ["SE"]},
-            {"name": "Bo Peep", "wind_directions": ["NNE", "NE", "ENE"]},
-            {"name": "Caburn", "wind_directions": ["S", "SSW", "SW"]},
+            {
+                "name": "Beachy Head",
+                "wind_directions": ["SE"],
+                "fly_bubble_site_id": "beachy-head-9354",
+            },
+            {
+                "name": "Bo Peep",
+                "wind_directions": ["NNE", "NE", "ENE"],
+                "fly_bubble_site_id": "bo-peep-6196",
+            },
+            {
+                "name": "Caburn",
+                "wind_directions": ["S", "SSW", "SW"],
+                "fly_bubble_site_id": "mount-caburn-6880",
+            },
             {
                 "name": "Devils Dyke",
                 "wind_directions": ["N", "WNW", "NW", "NNW"],
+                "fly_bubble_site_id": "devil's-dyke-6194",
             },
-            {"name": "Ditchling", "wind_directions": ["N", "NNE", "NNW"]},
-            {"name": "Firle", "wind_directions": ["N", "NNE", "NW", "NNW"]},
-            {"name": "High & Over", "wind_directions": ["E"]},
+            {
+                "name": "Ditchling",
+                "wind_directions": ["N", "NNE", "NNW"],
+                "fly_bubble_site_id": "ditchling-beacon-6195",
+            },
+            {
+                "name": "Firle",
+                "wind_directions": ["N", "NNE", "NW", "NNW"],
+                "fly_bubble_site_id": "firle-6198",
+            },
+            {
+                "name": "High & Over",
+                "wind_directions": ["E"],
+                "fly_bubble_site_id": "high-and%%20over-9355",
+            },
             {
                 "name": "Newhaven Cliffs",
                 "wind_directions": ["SSE", "S", "SSW"],
+                "fly_bubble_site_id": "newhaven-cliffs-6197",
             },
-            {"name": "Truleigh", "wind_directions": ["N", "NNE", "NNW"]},
+            {
+                "name": "Truleigh",
+                "wind_directions": ["N", "NNE", "NNW"],
+                "fly_bubble_site_id": "truleigh-hill-9353",
+            },
         ]
 
         return_sites = []
@@ -201,6 +232,18 @@ class Forecast:
                 return_sites.append(site)
 
         return return_sites
+
+    @classmethod
+    def fly_bubble_anchor(cls, date, time_code):
+        """Converts a date object and met office time reference e.g. '360' to
+        a FlyBubble weather site anchor.
+        """
+        anchor_numbers = {"360": 0, "540": 0, "720": 2, "900": 5, "1080": 8}
+        anchor_number = anchor_numbers[time_code]
+        day_offset = (date - date.today()).days
+        anchor_number = anchor_number + (9 * day_offset)
+
+        return anchor_number
 
     @classmethod
     def classify(cls, attribute, value):
@@ -258,6 +301,6 @@ def get_forecast():
         < datetime.datetime.now() - FORECAST_CACHE_TIMEOUT
     ):
         forecast.get(debug=True)
-        forecast.remove_bad_date()
+        forecast.remove_bad_dates()
 
     return render_template("forecast.html", forecast=forecast)

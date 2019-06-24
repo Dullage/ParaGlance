@@ -14,18 +14,6 @@
             <span class="attribute-title"><br>Wind Speed</span>
           </td>
 
-          <!-- Gust Strength -->
-          <td>
-            <span class="mdi mdi-weather-windy color-inherit attribute-icon" title="Gust Strength"></span>
-            <span class="attribute-title"><br>Gust Strength</span>
-          </td>
-
-          <!-- Gust Difference -->
-          <td>
-            <span class="mdi mdi-calculator color-inherit attribute-icon" title="Gust Difference"></span>
-            <span class="attribute-title"><br>Gust Difference</span>
-          </td>
-
           <!-- Conditions -->
           <td>
             <span class="mdi mdi-weather-cloudy color-inherit attribute-icon" title="Conditions"></span>
@@ -58,9 +46,13 @@
           {% set wind_direction_class = forecast.classify('wind_direction', time.D) %}
 
           <!-- Row Classification -->
-          {% if wind_speed_class == "positive"
+          {# % if wind_speed_class == "positive"
               and gust_strength_class == "positive"
               and gust_difference_class == "positive"
+              and conditions_class == "positive"
+              and wind_direction_class == "positive" % #}
+
+          {% if wind_speed_class == "positive"
               and conditions_class == "positive"
               and wind_direction_class == "positive" %}
             {% set time_class = "flyable" %}
@@ -76,17 +68,7 @@
 
             <!-- Wind Speed -->
             <td class="{{ wind_speed_class }} {{ time_class }} row-left">
-              {{ time.S }}<span class="mph"> mph</span>
-            </td>
-
-            <!-- Gust Strength -->
-            <td class="{{ gust_strength_class }} {{ time_class }}">
-              {{ time.G }}<span class="mph"> mph</span>
-            </td>
-
-            <!-- Gust Difference -->
-            <td class="{{ gust_difference_class }} {{ time_class }}">
-              {{ gust_difference }}<span class="mph"> mph</span>
+              {{ time.S }} - {{time.G}}<span class="mph"> mph</span>
             </td>
 
             <!-- Conditions -->
@@ -104,7 +86,10 @@
               {% set sites = forecast.get_site_list(time["D"]) %}
               {% if sites %}
                 {% for site in sites %}
-                  {{ site.name }}<br>
+                  {{ site.name }} <a href="https://flybubble.com/weather/{{ site.fly_bubble_site_id }}#{{ forecast.fly_bubble_anchor(date, time['$']) }}" target="_blank">
+                    <span class="mdi mdi-open-in-new" title="FlyBubble Weather Report"></span>
+                  </a>
+                  {% if not loop.last %}, {% endif %}
                 {% endfor %}
               {% else %}
                 <span class="no-sites">No Sites</span>
@@ -120,8 +105,14 @@
 
 <!-- Footer -->
 <div id="footer">
-  <span>Weather data last refreshed at {{ forecast.last_refresh }} 
+  <span>
+    Powered by <a href="http://www.metoffice.gov.uk" target="_blank">
+      <img id="met-office-logo" src="{{ url_for('static', filename='met-office.png') }}">
+    </a>
     - View on <a href="https://github.com/Dullage/ParaGlance">
       <span class="mdi mdi-github-circle"></span> GitHub
-    </a></span>
+    </a>
+  </span>
+  <br>
+  <span>Weather data last refreshed at {{ forecast.last_refresh }}</span>
 </div>

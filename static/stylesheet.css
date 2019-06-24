@@ -46,36 +46,6 @@ a {
     padding: 0 20px;
 }
 
-/* #header {
-    margin: 30px 0 60px 0;
-    text-align: center;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 18px 0 26px 0;
-    border-radius: 24px;
-}
-
-#title-div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#title-icon {
-    font-size: 74px;
-    margin: 0 12px 0 0;
-    color: #1400c7;
-}
-
-#header h1 {
-    font-size: 56px;
-    font-weight: bold;
-    letter-spacing: 0.05em;
-}
-
-#header p {
-    font-size: 17px;
-} */
-
 #footer {
     margin: 0 0 30px 0;
     text-align: center;
@@ -83,6 +53,9 @@ a {
 #footer span {
     color: whitesmoke;
     font-size: 11px;
+}
+#met-office-logo {
+    height: 0.8em;
 }
 
 
@@ -111,6 +84,10 @@ table {
 
 thead {
     font-weight: bold;
+    text-align: center;
+}
+
+tbody {
     text-align: center;
 }
 
@@ -164,50 +141,19 @@ td {
 
 /* Small Screens */
 
-@media only screen and (max-width: 1000px) {
-    .attribute-title {
-        display: none;
-    }
-}
-
-@media only screen and (max-width: 800px) {
-    .mph {
-        display: none;
-    }
-}
-
 @media only screen and (max-width: 650px) {
     * {
         font-size: 12px;
     }
-
-    /* #header {
-        margin: 0px 0 60px 0;
-        padding: 4px 4px 18px 4px;
-        border-radius: 0;
-    } */
-    
-    /* #title-icon {
-        font-size: 54px;
-        margin: 0 12px 0 0;
-    }
-
-    #header h1 {
-        font-size: 36px;
-    }
-    
-    #header p {
-        font-size: 12px;
-    } */
 
     #content {
         padding: 0;
     }
 
     .day {
-        border-radius: 0;
-        padding: 4px;
-        margin: 30px 0 60px 0;
+        border-radius: 12px;
+        padding: 8px;
+        margin: 4px 4px 30px 4px;
     }
 
     .day-header {
@@ -224,5 +170,9 @@ td {
 
     td {
         padding: 4px;
+    }
+
+    .mph {
+        font-size: 10px;
     }
 }

@@ -29,6 +29,8 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="{{ url_for('static', filename='javascript.js') }}"></script>
 
+  {% include "headers-custom.html" ignore missing %}
+
 </head>
 
 <body>
@@ -38,14 +40,6 @@
   </div>
 
   <div id="content" style="display: none;">
-    <!-- Header -->
-    <!-- <div id="header">
-      <div id="title-div">
-        <span id="title-icon" class="mdi mdi-weather-cloudy color-inherit"></span>
-        <h1> ParaGlance</h1>
-      </div>
-      <p>A broad glance at the weather for the SHGC sites...</p>
-    </div> -->
 
     <!-- Forecast -->
     <div id="forecast"></div>
