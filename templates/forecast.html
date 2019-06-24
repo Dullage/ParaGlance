@@ -86,8 +86,8 @@
               {% set sites = forecast.get_site_list(time["D"]) %}
               {% if sites %}
                 {% for site in sites %}
-                  {{ site.name }} <a href="https://flybubble.com/weather/{{ site.fly_bubble_site_id }}#{{ forecast.fly_bubble_anchor(date, time['$']) }}" target="_blank">
-                    <span class="mdi mdi-open-in-new" title="FlyBubble Weather Report"></span>
+                  <a href="https://flybubble.com/weather/{{ site.fly_bubble_site_id }}#{{ forecast.fly_bubble_anchor(date, time['$']) }}" target="_blank">
+                    {{ site.name }} <span class="mdi mdi-open-in-new" title="FlyBubble Weather Report"></span>
                   </a>
                   {% if not loop.last %}, {% endif %}
                 {% endfor %}

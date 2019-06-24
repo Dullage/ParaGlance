@@ -7,7 +7,10 @@
 }
 
 body {
-    background: url("/static/vladimir-anikeev-358805-unsplash.jpg") no-repeat center center fixed;
+    background-image: url("/static/vladimir-anikeev-358805-unsplash.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
     background-size: cover;
 }
 
@@ -153,7 +156,7 @@ td {
     .day {
         border-radius: 12px;
         padding: 8px;
-        margin: 4px 4px 30px 4px;
+        margin: 30px 8px;
     }
 
     .day-header {
